@@ -1,9 +1,9 @@
 package games
 
 import (
+	"database/sql"
 	"github.com/KowalskiPiotr98/gotabase"
 	"github.com/google/uuid"
-	"time"
 )
 
 type Game struct {
@@ -12,7 +12,7 @@ type Game struct {
 
 	Title       string
 	Owned       bool
-	ReleaseDate time.Time
+	ReleaseDate sql.NullTime
 	Released    bool
 }
 

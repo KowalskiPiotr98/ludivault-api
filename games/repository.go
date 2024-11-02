@@ -7,13 +7,13 @@ import (
 
 // GetGames returns a list of games with offset and limit used for pagination.
 func GetGames(offset int, limit int) ([]*Game, error) {
-	query := `select id, title, platform_id, owned, release_date, released from games order by title offset $1 limit $2`
+	query := `select id, platform_id, title, owned, release_date, released from games order by title offset $1 limit $2`
 	return operations.QueryRows(getDatabase(), scanGame, query, offset, limit)
 }
 
 // GetGame returns a single game selected by id.
 func GetGame(id uuid.UUID) (*Game, error) {
-	query := `select id, title, platform_id, owned, release_date, released from games where id = $1`
+	query := `select id, platform_id, title, owned, release_date, released from games where id = $1`
 	return operations.QueryRow(getDatabase(), scanGame, query, id)
 }
 
