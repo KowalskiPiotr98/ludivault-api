@@ -16,7 +16,7 @@ func (p *Platform) SetId(id uuid.UUID) {
 }
 
 func scanPlatform(row gotabase.Row) (*Platform, error) {
-	var platform *Platform
+	var platform Platform
 	err := row.Scan(&platform.Id, &platform.Name, &platform.ShortName)
-	return platform, err
+	return &platform, err
 }
