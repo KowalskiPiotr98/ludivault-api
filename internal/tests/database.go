@@ -3,6 +3,7 @@ package tests
 import (
 	"fmt"
 	"github.com/KowalskiPiotr98/gotabase"
+	"github.com/KowalskiPiotr98/gotabase/operations"
 	"github.com/KowalskiPiotr98/ludivault/database"
 	_ "github.com/lib/pq"
 	"os"
@@ -16,6 +17,7 @@ func GetDatabaseWithCleanup(t *testing.T) gotabase.Connector {
 }
 
 func GetDatabase() (gotabase.Connector, string) {
+	operations.Errors.RegisterDefaultPostgresHandlers()
 	dbName := GetRandomUuid()
 	baseConnectionString := getBaseConnectionString()
 	err := gotabase.InitialiseConnection(baseConnectionString+dbName.String(), "postgres")
