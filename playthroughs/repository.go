@@ -17,7 +17,7 @@ func GetPlaythroughs(gameId uuid.UUID) ([]*Playthrough, error) {
 	}
 	query = fmt.Sprintf(query, "")
 
-	return operations.QueryRows(getDatabase(), scanPlaythrough, query)
+	return operations.QueryRows(getDatabase(), scanPlaythrough, query, args...)
 }
 
 // GetPlaythrough returns a single playthrough selected by id.
