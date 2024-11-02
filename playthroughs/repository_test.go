@@ -31,8 +31,8 @@ func TestCreatePlaythrough(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		playthrough := Playthrough{
 			GameId:    makeGame("test", makePlatform()),
-			StartDate: time.Now().UTC(),
-			EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   123123,
 		}
@@ -53,8 +53,8 @@ func TestCreatePlaythrough(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		playthrough := Playthrough{
 			GameId:    tests.GetRandomUuid(),
-			StartDate: time.Now().UTC(),
-			EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   123123,
 		}
@@ -73,43 +73,43 @@ func TestGetPlaythroughs(t *testing.T) {
 		playthroughs := []Playthrough{
 			{
 				GameId:    game1,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
 			{
 				GameId:    game1,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
 			{
 				GameId:    game1,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
 			{
 				GameId:    game2,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
 			{
 				GameId:    game2,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
 			{
 				GameId:    game2,
-				StartDate: time.Now().UTC(),
-				EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+				StartDate: tests.GetRandomTestTime(),
+				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
 				Runtime:   123123,
 			},
@@ -157,8 +157,8 @@ func TestGetPlaythrough(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		playthrough := Playthrough{
 			GameId:    makeGame("test", makePlatform()),
-			StartDate: time.Now().UTC(),
-			EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   123123,
 		}
@@ -186,8 +186,8 @@ func TestUpdatePlaythrough(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		playthrough := Playthrough{
 			GameId:    makeGame("test", makePlatform()),
-			StartDate: time.Now().UTC(),
-			EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   123123,
 		}
@@ -220,8 +220,8 @@ func TestDeletePlaythrough(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		playthrough := Playthrough{
 			GameId:    makeGame("test", makePlatform()),
-			StartDate: time.Now().UTC(),
-			EndDate:   sql.NullTime{Time: time.Now().UTC(), Valid: true},
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   123123,
 		}
