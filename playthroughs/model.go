@@ -32,7 +32,7 @@ func (p *Playthrough) SetId(id uuid.UUID) {
 
 func scanPlaythrough(row gotabase.Row) (*Playthrough, error) {
 	var p Playthrough
-	if err := row.Scan(&p.Id, p.GameId, &p.StartDate, &p.EndDate, &p.Status, &p.Runtime); err != nil {
+	if err := row.Scan(&p.Id, &p.GameId, &p.StartDate, &p.EndDate, &p.Status, &p.Runtime); err != nil {
 		return nil, err
 	}
 	return &p, nil
