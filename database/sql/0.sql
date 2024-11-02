@@ -18,7 +18,7 @@ create table games (
     released boolean not null
 );
 
-create table playthrough (
+create table playthroughs (
     id uuid primary key default gen_random_uuid(),
     game_id uuid not null references games(id) on delete cascade,
     start_date timestamp with time zone not null,
