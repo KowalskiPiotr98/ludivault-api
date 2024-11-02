@@ -25,7 +25,7 @@ func TestCreateGame(t *testing.T) {
 			PlatformId:  makePlatform(),
 			Title:       "test game",
 			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: time.Now().UTC()},
+			ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
 			Released:    true,
 		}
 
@@ -65,21 +65,21 @@ func TestGetGames(t *testing.T) {
 				PlatformId:  platformId,
 				Title:       "test game 1",
 				Owned:       true,
-				ReleaseDate: sql.NullTime{Valid: true, Time: time.Now().UTC()},
+				ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
 				Released:    true,
 			},
 			{
 				PlatformId:  platformId,
 				Title:       "test game 2",
 				Owned:       true,
-				ReleaseDate: sql.NullTime{Valid: true, Time: time.Now().UTC()},
+				ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
 				Released:    true,
 			},
 			{
 				PlatformId:  platformId,
 				Title:       "test game 3",
 				Owned:       true,
-				ReleaseDate: sql.NullTime{Valid: true, Time: time.Now().UTC()},
+				ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
 				Released:    true,
 			},
 		}
@@ -105,7 +105,7 @@ func TestGetGame(t *testing.T) {
 			PlatformId:  makePlatform(),
 			Title:       "test game",
 			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: time.Now().UTC()},
+			ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
 			Released:    true,
 		}
 		tests.PanicOnErr(CreateGame(&game))
