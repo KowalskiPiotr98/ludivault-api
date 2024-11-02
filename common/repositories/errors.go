@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	DataNotFoundErr  = errors.New("requested data was not found in the database")
-	DuplicateDataErr = errors.New("this data already exists")
+	DataNotFoundErr        = errors.New("requested data was not found in the database")
+	DuplicateDataErr       = errors.New("this data already exists")
+	TooManyRowsAffectedErr = errors.New("too many rows have been affected by the query - consider rolling back the changes")
 )
 
 func IsNotFoundErr(err error) bool {
