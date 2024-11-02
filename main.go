@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/KowalskiPiotr98/gotabase"
+	"github.com/KowalskiPiotr98/gotabase/operations"
 	"github.com/KowalskiPiotr98/ludivault/database"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -14,6 +15,8 @@ func init() {
 	log.SetOutput(os.Stdout)
 	//todo: make level configurable
 	log.SetLevel(log.InfoLevel)
+
+	operations.Errors.RegisterDefaultPostgresHandlers()
 }
 
 func main() {
