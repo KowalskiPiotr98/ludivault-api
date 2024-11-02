@@ -14,7 +14,8 @@ create table games (
     title varchar(500) not null,
     platform_id uuid not null references platforms(id) on delete restrict,
     owned boolean not null default false,
-    release_date timestamp with time zone null
+    release_date timestamp with time zone null,
+    released boolean not null
 );
 
 create table playthrough (
