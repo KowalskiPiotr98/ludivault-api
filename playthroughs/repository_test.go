@@ -34,7 +34,7 @@ func TestCreatePlaythrough(t *testing.T) {
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
-			Runtime:   123123,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 
 		err := CreatePlaythrough(&playthrough)
@@ -56,7 +56,7 @@ func TestCreatePlaythrough(t *testing.T) {
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
-			Runtime:   123123,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 
 		err := CreatePlaythrough(&playthrough)
@@ -76,42 +76,42 @@ func TestGetPlaythroughs(t *testing.T) {
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 			{
 				GameId:    game1,
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 			{
 				GameId:    game1,
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 			{
 				GameId:    game2,
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 			{
 				GameId:    game2,
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 			{
 				GameId:    game2,
 				StartDate: tests.GetRandomTestTime(),
 				EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 				Status:    PlaythroughCompleted,
-				Runtime:   123123,
+				Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 			},
 		}
 		for i := range playthroughs {
@@ -160,7 +160,7 @@ func TestGetPlaythrough(t *testing.T) {
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
-			Runtime:   123123,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 		tests.PanicOnErr(CreatePlaythrough(&playthrough))
 
@@ -189,13 +189,13 @@ func TestUpdatePlaythrough(t *testing.T) {
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
-			Runtime:   123123,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 		tests.PanicOnErr(CreatePlaythrough(&playthrough))
 		playthrough.StartDate = time.Now().AddDate(0, 1, 1).UTC()
 		playthrough.EndDate = sql.NullTime{}
 		playthrough.Status = PlaythroughSuspended
-		playthrough.Runtime = 9
+		playthrough.Runtime = sql.NullInt32{Valid: true, Int32: 9}
 
 		err := UpdatePlaythrough(&playthrough)
 
@@ -223,7 +223,7 @@ func TestDeletePlaythrough(t *testing.T) {
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
-			Runtime:   123123,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 		tests.PanicOnErr(CreatePlaythrough(&playthrough))
 

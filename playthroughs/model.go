@@ -23,7 +23,7 @@ type Playthrough struct {
 	StartDate time.Time
 	EndDate   sql.NullTime
 	Status    PlaythroughStatus
-	Runtime   int
+	Runtime   sql.NullInt32
 }
 
 func (p *Playthrough) SetId(id uuid.UUID) {

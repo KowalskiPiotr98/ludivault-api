@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/KowalskiPiotr98/gotabase"
 	"github.com/KowalskiPiotr98/gotabase/operations"
+	"github.com/KowalskiPiotr98/ludivault/controllers"
 	"github.com/KowalskiPiotr98/ludivault/database"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -44,10 +45,10 @@ func setupEngine() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(getLogger())
-	//todo: trusted proxies
+	router.ForwardedByClientIP = true
+	router.SetTrustedProxies([]string{"192.168.0.0/16", "10.0.0.0/8", "172.16.0.0/12"})
 
-	//todo: base path config
-	//basePath := ""
+	controllers.SetRoutes(router.Group("/api/v1"))
 
 	return router
 }
