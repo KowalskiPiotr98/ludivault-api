@@ -44,10 +44,8 @@ func setupEngine() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(getLogger())
-	//todo: trusted proxies
-
-	//todo: base path config
-	//basePath := ""
+	router.ForwardedByClientIP = true
+	router.SetTrustedProxies([]string{"192.168.0.0/16", "10.0.0.0/8", "172.16.0.0/12"})
 
 	return router
 }
