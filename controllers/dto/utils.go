@@ -30,3 +30,21 @@ func makePointerFromNullTime(time sql.NullTime) *time.Time {
 	}
 	return nil
 }
+
+func makePointerFromNullInt(value sql.NullInt32) *int {
+	if value.Valid {
+		typedInt := int(value.Int32)
+		return &typedInt
+	}
+	return nil
+}
+
+func makeNullIntFromPointer(value *int) sql.NullInt32 {
+	if value == nil {
+		return sql.NullInt32{}
+	}
+	return sql.NullInt32{
+		Valid: true,
+		Int32: int32(*value),
+	}
+}
