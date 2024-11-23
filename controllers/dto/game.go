@@ -29,9 +29,9 @@ func MapGameToDto(game *games.Game) *GameDto {
 type GameEditDto struct {
 	PlatformId  uuid.UUID  `json:"platformId" binding:"required"`
 	Title       string     `json:"title" binding:"required,max=500"`
-	Owned       bool       `json:"owned" binding:"required"`
+	Owned       bool       `json:"owned"`
 	ReleaseDate *time.Time `json:"releaseDate"`
-	Released    bool       `json:"released" binding:"required"`
+	Released    bool       `json:"released"`
 }
 
 func MapGameEditDtoToObject(id uuid.UUID, game *GameEditDto) *games.Game {
