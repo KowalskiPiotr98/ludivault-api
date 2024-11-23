@@ -1,6 +1,6 @@
 module github.com/KowalskiPiotr98/ludivault
 
-go 1.23.1
+go 1.23
 
 require (
 	github.com/KowalskiPiotr98/gotabase v0.3.0
