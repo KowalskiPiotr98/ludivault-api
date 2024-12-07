@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/KowalskiPiotr98/ludivault/controllers/dto"
 	"github.com/KowalskiPiotr98/ludivault/games"
+	"github.com/KowalskiPiotr98/ludivault/playthroughs"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
@@ -44,6 +45,19 @@ func getGame(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.MapGameToDto(item))
+}
+
+func getPlaythroughsForGame(c *gin.Context) {
+	id, err := parseUuidFromPath(c)
+
+	list, err := playthroughs.GetPlaythroughs(id)
+
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.MapMany(list, dto.MapPlaythroughToDto))
 }
 
 func createGame(c *gin.Context) {
