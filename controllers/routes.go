@@ -15,6 +15,7 @@ func SetRoutes(r *gin.RouterGroup) {
 	games := r.Group("/games")
 	games.GET("/", getGames)
 	games.GET("/:id", getGame)
+	games.GET("/:id/playthroughs", getPlaythroughsForGame)
 	games.POST("/", createGame)
 	games.PUT("/:id", updateGame)
 	games.DELETE("/:id", deleteGame)
