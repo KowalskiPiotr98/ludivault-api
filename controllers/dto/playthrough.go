@@ -30,8 +30,8 @@ type PlaythroughEditDto struct {
 	GameId    uuid.UUID  `json:"gameId" binding:"required"`
 	StartDate time.Time  `json:"startDate" binding:"required"`
 	EndDate   *time.Time `json:"endDate"`
-	Status    int        `json:"status" binding:"required,min=0,max=4"`
-	Runtime   *int       `json:"runtime" binding:"min=0"`
+	Status    int        `json:"status" binding:"min=0,max=4"`
+	Runtime   int        `json:"runtime" binding:"min=0"`
 }
 
 func MapPlaythroughEditDtoToObject(id uuid.UUID, playthrough *PlaythroughEditDto) *playthroughs.Playthrough {
@@ -41,6 +41,6 @@ func MapPlaythroughEditDtoToObject(id uuid.UUID, playthrough *PlaythroughEditDto
 		StartDate: playthrough.StartDate,
 		EndDate:   makeNullTimeFromPointer(playthrough.EndDate),
 		Status:    playthroughs.PlaythroughStatus(playthrough.Status),
-		Runtime:   makeNullIntFromPointer(playthrough.Runtime),
+		Runtime:   makeNullInt(playthrough.Runtime),
 	}
 }

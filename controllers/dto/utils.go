@@ -39,12 +39,12 @@ func makePointerFromNullInt(value sql.NullInt32) *int {
 	return nil
 }
 
-func makeNullIntFromPointer(value *int) sql.NullInt32 {
-	if value == nil {
+func makeNullInt(value int) sql.NullInt32 {
+	if value == 0 {
 		return sql.NullInt32{}
 	}
 	return sql.NullInt32{
 		Valid: true,
-		Int32: int32(*value),
+		Int32: int32(value),
 	}
 }
