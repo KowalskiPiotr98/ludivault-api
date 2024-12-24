@@ -27,3 +27,5 @@ go.work.sum
 
 pg-data/
 
+Dockerfile
+docker-compose.yml

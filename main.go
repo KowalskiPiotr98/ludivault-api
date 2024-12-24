@@ -22,8 +22,7 @@ func init() {
 
 func main() {
 	log.Debugln("Initialising database connection")
-	//todo: make this configurable
-	if err := gotabase.InitialiseConnection("user=postgres dbname=ludivault password=postgres sslmode=disable", "postgres"); err != nil {
+	if err := gotabase.InitialiseConnection(getRequiredConfig("db"), "postgres"); err != nil {
 		log.Panicf("Failed to initialise database connection: %v", err)
 	}
 	defer gotabase.CloseConnection()
@@ -35,8 +34,7 @@ func main() {
 	router := setupEngine()
 
 	log.Infoln("Starting server...")
-	//todo: configurable address
-	if err := router.Run("localhost:5500"); err != nil {
+	if err := router.Run(getOptionalConfig("listen", "localhost:5500")); err != nil {
 		log.Panicf("Server failed while listening: %v", err)
 	}
 }
