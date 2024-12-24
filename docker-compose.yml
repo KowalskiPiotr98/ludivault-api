@@ -1,0 +1,22 @@
+services:
+  ludivault-api:
+    image: ludivault-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:5500:5500"
+    restart: unless-stopped
+    environment:
+      LUDIVAULT_DB: "host=postgres user=ludivault dbname=ludivault password=ludivault sslmode=disable"
+      GIN_MODE: release
+
+  postgres:
+    image: postgres:latest
+    volumes:
+      - ./pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ludivault
+      POSTGRES_PASSWORD: ludivault
+      POSTGRES_DB: ludivault
