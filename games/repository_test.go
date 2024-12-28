@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
 )
 
 func makePlatform() uuid.UUID {
@@ -18,16 +17,20 @@ func makePlatform() uuid.UUID {
 	return id
 }
 
+func makeDefaultTestGame(platformId uuid.UUID) Game {
+	return Game{
+		PlatformId:  platformId,
+		Title:       "test game",
+		Owned:       true,
+		ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
+		Released:    true,
+	}
+}
+
 func TestCreateGame(t *testing.T) {
 	t.Run("New game created", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		game := Game{
-			PlatformId:  makePlatform(),
-			Title:       "test game",
-			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
-			Released:    true,
-		}
+		game := makeDefaultTestGame(makePlatform())
 
 		err := CreateGame(&game)
 
@@ -42,13 +45,7 @@ func TestCreateGame(t *testing.T) {
 
 	t.Run("Missing platform", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		game := Game{
-			PlatformId:  tests.GetRandomUuid(),
-			Title:       "test game",
-			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: time.Now()},
-			Released:    true,
-		}
+		game := makeDefaultTestGame(tests.GetRandomUuid())
 
 		err := CreateGame(&game)
 
@@ -101,13 +98,7 @@ func TestGetGames(t *testing.T) {
 func TestGetGame(t *testing.T) {
 	t.Run("Game exists - returned", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		game := Game{
-			PlatformId:  makePlatform(),
-			Title:       "test game",
-			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: tests.GetRandomTestTime()},
-			Released:    true,
-		}
+		game := makeDefaultTestGame(makePlatform())
 		tests.PanicOnErr(CreateGame(&game))
 
 		dbGame, err := GetGame(game.Id)
@@ -128,13 +119,7 @@ func TestGetGame(t *testing.T) {
 func TestUpdateGame(t *testing.T) {
 	t.Run("Game exists - updated", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		game := Game{
-			PlatformId:  makePlatform(),
-			Title:       "test game",
-			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: time.Now()},
-			Released:    true,
-		}
+		game := makeDefaultTestGame(makePlatform())
 		tests.PanicOnErr(CreateGame(&game))
 		game.Title = "updated game"
 		game.Owned = false
@@ -161,13 +146,7 @@ func TestUpdateGame(t *testing.T) {
 func TestDeleteGame(t *testing.T) {
 	t.Run("Game exists - deleted", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		game := Game{
-			PlatformId:  makePlatform(),
-			Title:       "test game",
-			Owned:       true,
-			ReleaseDate: sql.NullTime{Valid: true, Time: time.Now()},
-			Released:    true,
-		}
+		game := makeDefaultTestGame(makePlatform())
 		tests.PanicOnErr(CreateGame(&game))
 
 		err := DeleteGame(game.Id)
