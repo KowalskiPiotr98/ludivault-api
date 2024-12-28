@@ -7,13 +7,17 @@ import (
 	"testing"
 )
 
+func makeTestDefaultPlatform() Platform {
+	return Platform{
+		Name:      "test platform",
+		ShortName: "tp",
+	}
+}
+
 func TestCreatePlatform(t *testing.T) {
 	t.Run("New platform created", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		newPlatform := Platform{
-			Name:      "test platform",
-			ShortName: "tp",
-		}
+		newPlatform := makeTestDefaultPlatform()
 
 		err := CreatePlatform(&newPlatform)
 
@@ -27,10 +31,7 @@ func TestCreatePlatform(t *testing.T) {
 
 	t.Run("Platform already exists", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		newPlatform := Platform{
-			Name:      "test platform",
-			ShortName: "tp",
-		}
+		newPlatform := makeTestDefaultPlatform()
 		tests.PanicOnErr(CreatePlatform(&newPlatform))
 
 		err := CreatePlatform(&newPlatform)
@@ -73,10 +74,7 @@ func TestGetPlatforms(t *testing.T) {
 func TestGetPlatform(t *testing.T) {
 	t.Run("Platform exists - returned", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		newPlatform := Platform{
-			Name:      "test platform",
-			ShortName: "tp",
-		}
+		newPlatform := makeTestDefaultPlatform()
 		tests.PanicOnErr(CreatePlatform(&newPlatform))
 
 		dbPlatform, err := GetPlatform(newPlatform.Id)
@@ -96,10 +94,7 @@ func TestGetPlatform(t *testing.T) {
 func TestUpdatePlatform(t *testing.T) {
 	t.Run("Platform exists - updated", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		newPlatform := Platform{
-			Name:      "test platform",
-			ShortName: "tp",
-		}
+		newPlatform := makeTestDefaultPlatform()
 		tests.PanicOnErr(CreatePlatform(&newPlatform))
 		newPlatform.Name = "updated platform"
 		newPlatform.ShortName = "up"
@@ -144,10 +139,7 @@ func TestUpdatePlatform(t *testing.T) {
 func TestDeletePlatform(t *testing.T) {
 	t.Run("Platform exists - deleted", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		platform := Platform{
-			Name:      "test platform",
-			ShortName: "tp",
-		}
+		platform := makeTestDefaultPlatform()
 		tests.PanicOnErr(CreatePlatform(&platform))
 
 		err := DeletePlatform(platform.Id)
