@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ func getConfig(name string) (string, bool) {
 	return os.LookupEnv(fmt.Sprintf("LUDIVAULT_%s", strings.ToUpper(name)))
 }
 
-func getOptionalConfig(name string, fallback string) string {
+func GetOptionalConfig(name string, fallback string) string {
 	value, ok := getConfig(name)
 	if !ok {
 		return fallback
@@ -19,7 +19,7 @@ func getOptionalConfig(name string, fallback string) string {
 	return value
 }
 
-func getRequiredConfig(name string) string {
+func GetRequiredConfig(name string) string {
 	value, ok := getConfig(name)
 	if !ok {
 		log.Panicf("Config %s not found", name)

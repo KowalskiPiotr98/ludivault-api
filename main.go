@@ -5,6 +5,7 @@ import (
 	"github.com/KowalskiPiotr98/gotabase/operations"
 	"github.com/KowalskiPiotr98/ludivault/controllers"
 	"github.com/KowalskiPiotr98/ludivault/database"
+	"github.com/KowalskiPiotr98/ludivault/utils"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
@@ -22,7 +23,7 @@ func init() {
 
 func main() {
 	log.Debugln("Initialising database connection")
-	if err := gotabase.InitialiseConnection(getRequiredConfig("db"), "postgres"); err != nil {
+	if err := gotabase.InitialiseConnection(utils.GetRequiredConfig("db"), "postgres"); err != nil {
 		log.Panicf("Failed to initialise database connection: %v", err)
 	}
 	defer gotabase.CloseConnection()
@@ -34,7 +35,7 @@ func main() {
 	router := setupEngine()
 
 	log.Infoln("Starting server...")
-	if err := router.Run(getOptionalConfig("listen", "localhost:5500")); err != nil {
+	if err := router.Run(utils.GetOptionalConfig("listen", "localhost:5500")); err != nil {
 		log.Panicf("Server failed while listening: %v", err)
 	}
 }
