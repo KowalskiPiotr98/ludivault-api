@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
 // GetUserMiddleware returns gin handler function that reads user data from session store and saves it as context item.
@@ -17,6 +18,19 @@ func GetUserMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userId", userId)
+
+		c.Next()
+	}
+}
+
+// GetLoginRequiredMiddleware will return 401 Unauthorised when the user is not logged in.
+// Note that this middleware must be registered after the GetUserMiddleware.
+func GetLoginRequiredMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !IsLoggedIn(c) {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		c.Next()
 	}
