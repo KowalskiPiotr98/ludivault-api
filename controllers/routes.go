@@ -8,6 +8,7 @@ func SetRoutes(r *gin.RouterGroup) {
 	auth.GET("", initAuth)
 	auth.GET("/callback", authCallback)
 	auth.POST("/logout", logout)
+	auth.GET("/providers", getProviders)
 
 	// platforms API
 	platforms := r.Group("/platforms")

@@ -47,3 +47,7 @@ func logout(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/")
 }
+
+func getProviders(c *gin.Context) {
+	c.JSON(http.StatusOK, auth.GetEnabledProviders())
+}
