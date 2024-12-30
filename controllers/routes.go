@@ -3,6 +3,12 @@ package controllers
 import "github.com/gin-gonic/gin"
 
 func SetRoutes(r *gin.RouterGroup) {
+	//auth API
+	auth := r.Group("/auth")
+	auth.GET("", initAuth)
+	auth.GET("/callback", authCallback)
+	auth.POST("/logout", logout)
+
 	// platforms API
 	platforms := r.Group("/platforms")
 	platforms.GET("", getPlatforms)

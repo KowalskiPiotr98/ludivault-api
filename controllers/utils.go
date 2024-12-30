@@ -3,8 +3,12 @@ package controllers
 import (
 	"errors"
 	"github.com/KowalskiPiotr98/gotabase/operations"
+	"github.com/KowalskiPiotr98/ludivault/auth"
+	"github.com/KowalskiPiotr98/ludivault/users"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/markbates/goth"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -37,4 +41,17 @@ func parseUuidFromPath(c *gin.Context) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 	return id, nil
+}
+
+func initUserSession(user *goth.User, c *gin.Context) error {
+	localUser := users.NewFromProvider(user)
+	if err := users.Get(localUser); err != nil {
+		log.Warnf("Failed to initialise user session: %v", err)
+		return err
+	}
+	if err := auth.StoreUserInSession(c, localUser.Id); err != nil {
+		log.Warnf("Failed to initialise user session: %v", err)
+		return err
+	}
+	return nil
 }
