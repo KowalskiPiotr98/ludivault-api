@@ -17,6 +17,8 @@ func GetUserMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userId", userId)
+
+		c.Next()
 	}
 }
 
