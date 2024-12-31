@@ -26,7 +26,7 @@ At least one login provider must be configured.
 The following login providers are supported (expand for configuration details):
 
 <details>
-<summary>gitea</summary>
+<summary>Gitea</summary>
 
 - `LUDIVAULT_SSO_GITEA_CLIENT_ID`
 - `LUDIVAULT_SSO_GITEA_CLIENT_SECRET`
