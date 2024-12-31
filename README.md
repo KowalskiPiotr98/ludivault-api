@@ -60,7 +60,7 @@ Self-hosted GitHub Enterprise is not supported (because why would it).
 </details>
 
 <details>
-<summary>Discord</summary>
+<summary>Google</summary>
 
 - `LUDIVAULT_SSO_GOOGLE_CLIENT_ID`
 - `LUDIVAULT_SSO_GOOGLE_CLIENT_SECRET`
