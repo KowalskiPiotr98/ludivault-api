@@ -45,7 +45,7 @@ func parseUuidFromPath(c *gin.Context) (uuid.UUID, error) {
 
 func initUserSession(user *goth.User, c *gin.Context) error {
 	localUser := users.NewFromProvider(user)
-	if err := users.Get(localUser); err != nil {
+	if err := users.GetOrCreate(localUser); err != nil {
 		log.Warnf("Failed to initialise user session: %v", err)
 		return err
 	}

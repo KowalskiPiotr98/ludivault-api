@@ -16,7 +16,7 @@ func TestGet(t *testing.T) {
 			ProviderName: "test",
 		}
 
-		err := Get(user)
+		err := GetOrCreate(user)
 
 		assert.NoError(t, err)
 		assert.NotEqual(t, uuid.Nil, user.Id)
@@ -29,11 +29,11 @@ func TestGet(t *testing.T) {
 			ProviderId:   "localhost",
 			ProviderName: "test",
 		}
-		tests.PanicOnErr(Get(user))
+		tests.PanicOnErr(GetOrCreate(user))
 
 		user.Email = "user2@localhost"
 		user.Id = uuid.Nil
-		err := Get(user)
+		err := GetOrCreate(user)
 
 		assert.NoError(t, err)
 		assert.NotEqual(t, uuid.Nil, user.Id)
