@@ -28,10 +28,10 @@ var (
 	}
 )
 
-func SetupProviders(baseUrl string) {
+func SetupProviders(baseUrl string) error {
 	if areProvidersSet() {
 		// prevent duplicate provider setup
-		return
+		return ProvidersAlreadyInitialised
 	}
 
 	baseUrl = strings.TrimRight(baseUrl, "/")
@@ -50,6 +50,12 @@ func SetupProviders(baseUrl string) {
 	}
 
 	goth.UseProviders(enabledProviders...)
+
+	if !areProvidersSet() {
+		return NoProvidersSet
+	}
+
+	return nil
 }
 
 func GetEnabledProviders() []string {

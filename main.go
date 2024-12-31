@@ -61,7 +61,9 @@ func runEngine() error {
 	controllers.SetRoutes(router.Group("/api/v1"))
 
 	auth.InitSessionStore(listenDomain)
-	auth.SetupProviders(baseAddress.String())
+	if err = auth.SetupProviders(baseAddress.String()); err != nil {
+		log.Panicf("Failed to setup login providers: %v", err)
+	}
 
 	log.Infoln("Starting server...")
 	return router.Run(listenAddress)
