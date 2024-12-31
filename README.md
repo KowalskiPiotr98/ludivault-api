@@ -10,6 +10,8 @@ The following values can be used to configure the API:
 - `GIN_MODE` - please refer to Gin documentation; when in doubt set to `release`,
 - `LUDIVAULT_DB` - connection string for the database, more details available in the [Postgres docs](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING); you can use `"host=postgres user=ludivault dbname=ludivault password=ludivault sslmode=disable"` as inspiration (just remember to change the password),
 - `LUDIVAULT_LISTEN` - defines an interface at which the application listens for requests; defaults to `localhost:5500` if not set.
+- `LUDIVAULT_BASE_ADDRESS` - base public address by which the user will access Ludivault. Used for SSO callback config - does not affect listen address.
+- `LUDIVAULT_SESSION_KEY` - secret key used for session tokens encryption. You **MUST** set this to a random, secret value. You can change this value to log out all users at once (requires restart of the application).
 
 ### Login providers
 The application does not support login with a local account.
