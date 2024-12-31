@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/KowalskiPiotr98/ludivault/auth"
+	"github.com/KowalskiPiotr98/ludivault/users"
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
 	log "github.com/sirupsen/logrus"
@@ -50,4 +51,19 @@ func logout(c *gin.Context) {
 
 func getProviders(c *gin.Context) {
 	c.JSON(http.StatusOK, auth.GetEnabledProviders())
+}
+
+func getUser(c *gin.Context) {
+	if !auth.IsLoggedIn(c) {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	user, err := users.GetById(auth.GetUserId(c))
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }
