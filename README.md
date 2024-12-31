@@ -81,8 +81,6 @@ Self-hosted GitHub Enterprise is not supported (because why would it).
 
 This allows you to set up authentication using any provider compatible with the OpenID Connect protocol.
 
-> [!NOTE]
-> Only one custom provider can be configured at a time.
-> 
-> Changing custom providers is not supported, unless all users and their ids are retained between the providers.
+Only one custom provider can be configured at a time.
+Changing custom providers is not supported, unless all users and their ids are retained between the providers.
 </details>
