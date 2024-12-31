@@ -62,6 +62,10 @@ func TestGetPlatforms(t *testing.T) {
 		for i := range platforms {
 			tests.PanicOnErr(CreatePlatform(&platforms[i], userId))
 		}
+		tests.PanicOnErr(CreatePlatform(&Platform{
+			Name:      "unauthorised",
+			ShortName: "un",
+		}, tests.MakeTestUserId(getDatabase())))
 
 		list, err := GetPlatforms(userId)
 
@@ -85,11 +89,23 @@ func TestGetPlatform(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, newPlatform, *dbPlatform)
 	})
+
 	t.Run("Platform does not exist - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
 
 		_, err := GetPlatform(tests.GetRandomUuid(), userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		newPlatform := makeTestDefaultPlatform()
+		tests.PanicOnErr(CreatePlatform(&newPlatform, userId))
+
+		_, err := GetPlatform(newPlatform.Id, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
@@ -111,6 +127,7 @@ func TestUpdatePlatform(t *testing.T) {
 		tests.PanicOnErr(err)
 		assert.Equal(t, newPlatform, *dbPlatform)
 	})
+
 	t.Run("Platform not found - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
@@ -122,6 +139,7 @@ func TestUpdatePlatform(t *testing.T) {
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
+
 	t.Run("Duplicate platform - returns error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
@@ -141,6 +159,19 @@ func TestUpdatePlatform(t *testing.T) {
 
 		assert.Equal(t, operations.Errors.DataAlreadyExistErr, err)
 	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		newPlatform := makeTestDefaultPlatform()
+		tests.PanicOnErr(CreatePlatform(&newPlatform, userId))
+		newPlatform.Name = "updated platform"
+		newPlatform.ShortName = "up"
+
+		err := UpdatePlatform(&newPlatform, tests.MakeTestUserId(getDatabase()))
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
 }
 
 func TestDeletePlatform(t *testing.T) {
@@ -156,11 +187,23 @@ func TestDeletePlatform(t *testing.T) {
 		_, err = GetPlatform(platform.Id, userId)
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
+
 	t.Run("Platform not found - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
 
 		err := DeletePlatform(tests.GetRandomUuid(), userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		platform := makeTestDefaultPlatform()
+		userId := tests.MakeTestUserId(getDatabase())
+		tests.PanicOnErr(CreatePlatform(&platform, userId))
+
+		err := DeletePlatform(platform.Id, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})

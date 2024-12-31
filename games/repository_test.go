@@ -86,6 +86,8 @@ func TestGetGames(t *testing.T) {
 		for i := range games {
 			tests.PanicOnErr(CreateGame(&games[i], userId))
 		}
+		clone := games[0]
+		tests.PanicOnErr(CreateGame(&clone, tests.MakeTestUserId(getDatabase())))
 
 		list, err := GetGames(0, 100, userId)
 
@@ -111,11 +113,23 @@ func TestGetGame(t *testing.T) {
 		dbGame.ReleaseDate.Time = game.ReleaseDate.Time.UTC()
 		assert.Equal(t, game, *dbGame)
 	})
+
 	t.Run("Game does not exist - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
 
 		_, err := GetGame(tests.GetRandomUuid(), userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		game := makeDefaultTestGame(makePlatform(userId))
+		tests.PanicOnErr(CreateGame(&game, userId))
+
+		_, err := GetGame(game.Id, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
@@ -139,12 +153,28 @@ func TestUpdateGame(t *testing.T) {
 		tests.PanicOnErr(err)
 		assert.Equal(t, game, *dbGame)
 	})
+
 	t.Run("Game not found - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		game := Game{Id: tests.GetRandomUuid()}
 		userId := tests.MakeTestUserId(getDatabase())
 
 		err := UpdateGame(&game, userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		game := makeDefaultTestGame(makePlatform(userId))
+		tests.PanicOnErr(CreateGame(&game, userId))
+		game.Title = "updated game"
+		game.Owned = false
+		game.ReleaseDate = sql.NullTime{}
+		game.Released = false
+
+		err := UpdateGame(&game, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
@@ -163,11 +193,23 @@ func TestDeleteGame(t *testing.T) {
 		_, err = GetGame(game.Id, userId)
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
+
 	t.Run("Game not found - error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 		userId := tests.MakeTestUserId(getDatabase())
 
 		err := DeleteGame(tests.GetRandomUuid(), userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		game := makeDefaultTestGame(makePlatform(userId))
+		tests.PanicOnErr(CreateGame(&game, userId))
+
+		err := DeleteGame(tests.GetRandomUuid(), tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
