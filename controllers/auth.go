@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/KowalskiPiotr98/ludivault/auth"
+	"github.com/KowalskiPiotr98/ludivault/controllers/dto"
 	"github.com/KowalskiPiotr98/ludivault/users"
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
@@ -65,5 +66,5 @@ func getUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, dto.MapUserToDto(user))
 }
