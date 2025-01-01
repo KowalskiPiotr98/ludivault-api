@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/KowalskiPiotr98/ludivault/auth"
 	"github.com/KowalskiPiotr98/ludivault/controllers/dto"
 	"github.com/KowalskiPiotr98/ludivault/platforms"
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 )
 
 func getPlatforms(c *gin.Context) {
-	list, err := platforms.GetPlatforms()
+	list, err := platforms.GetPlatforms(auth.GetUserId(c))
 
 	if err != nil {
 		handleError(c, err)
@@ -26,7 +27,7 @@ func getPlatform(c *gin.Context) {
 		return
 	}
 
-	item, err := platforms.GetPlatform(id)
+	item, err := platforms.GetPlatform(id, auth.GetUserId(c))
 	if err != nil {
 		handleError(c, err)
 		return
@@ -42,7 +43,7 @@ func createPlatform(c *gin.Context) {
 	}
 
 	mapped := dto.MapPlatformEditDtoToObject(uuid.Nil, &model)
-	if err := platforms.CreatePlatform(mapped); err != nil {
+	if err := platforms.CreatePlatform(mapped, auth.GetUserId(c)); err != nil {
 		handleError(c, err)
 		return
 	}
@@ -61,7 +62,7 @@ func updatePlatform(c *gin.Context) {
 	}
 
 	mapped := dto.MapPlatformEditDtoToObject(id, &model)
-	if err = platforms.UpdatePlatform(mapped); err != nil {
+	if err = platforms.UpdatePlatform(mapped, auth.GetUserId(c)); err != nil {
 		handleError(c, err)
 		return
 	}
@@ -75,7 +76,7 @@ func deletePlatform(c *gin.Context) {
 		return
 	}
 
-	err = platforms.DeletePlatform(id)
+	err = platforms.DeletePlatform(id, auth.GetUserId(c))
 	if err != nil {
 		handleError(c, err)
 		return

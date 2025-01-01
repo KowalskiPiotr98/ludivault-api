@@ -10,18 +10,18 @@ import (
 	"time"
 )
 
-func makePlatform() uuid.UUID {
+func makePlatform(userId uuid.UUID) uuid.UUID {
 	id := tests.GetRandomUuid()
-	query := `insert into platforms (id, name, short_name) values ($1, 'aa', 'aa')`
-	_, err := getDatabase().Exec(query, id)
+	query := `insert into platforms (id, name, short_name, user_id) values ($1, 'aa', 'aa', $2)`
+	_, err := getDatabase().Exec(query, id, userId)
 	tests.PanicOnErr(err)
 	return id
 }
 
-func makeGame(title string, platformId uuid.UUID) uuid.UUID {
+func makeGame(title string, platformId uuid.UUID, userId uuid.UUID) uuid.UUID {
 	id := tests.GetRandomUuid()
-	query := `insert into games (id, title, platform_id, release_date, released) values ($1, $3, $2, null, true)`
-	_, err := getDatabase().Exec(query, id, platformId, title)
+	query := `insert into games (id, title, platform_id, release_date, released, user_id) values ($1, $3, $2, null, true, $4)`
+	_, err := getDatabase().Exec(query, id, platformId, title, userId)
 	tests.PanicOnErr(err)
 	return id
 }
@@ -29,15 +29,16 @@ func makeGame(title string, platformId uuid.UUID) uuid.UUID {
 func TestCreatePlaythrough(t *testing.T) {
 	t.Run("New playthrough created", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
 		playthrough := Playthrough{
-			GameId:    makeGame("test", makePlatform()),
+			GameId:    makeGame("test", makePlatform(userId), userId),
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 
-		err := CreatePlaythrough(&playthrough)
+		err := CreatePlaythrough(&playthrough, userId)
 
 		assert.NoError(t, err)
 		dbRow, err := getDatabase().QueryRow("select id, game_id, start_date, end_date, status, runtime_minutes from playthroughs where id = $1", playthrough.Id)
@@ -51,6 +52,7 @@ func TestCreatePlaythrough(t *testing.T) {
 
 	t.Run("Game missing returns error", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
 		playthrough := Playthrough{
 			GameId:    tests.GetRandomUuid(),
 			StartDate: tests.GetRandomTestTime(),
@@ -59,17 +61,33 @@ func TestCreatePlaythrough(t *testing.T) {
 			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
 
-		err := CreatePlaythrough(&playthrough)
+		err := CreatePlaythrough(&playthrough, userId)
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised for game", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		playthrough := Playthrough{
+			GameId:    makeGame("test", makePlatform(userId), userId),
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
+			Status:    PlaythroughCompleted,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
+		}
+
+		err := CreatePlaythrough(&playthrough, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
 }
 
 func TestGetPlaythroughs(t *testing.T) {
-	makePlaythroughs := func() []Playthrough {
-		platform := makePlatform()
-		game1 := makeGame("game 1", platform)
-		game2 := makeGame("game 2", platform)
+	makePlaythroughs := func(userId uuid.UUID) []Playthrough {
+		platform := makePlatform(userId)
+		game1 := makeGame("game 1", platform, userId)
+		game2 := makeGame("game 2", platform, userId)
 		playthroughs := []Playthrough{
 			{
 				GameId:    game1,
@@ -115,16 +133,25 @@ func TestGetPlaythroughs(t *testing.T) {
 			},
 		}
 		for i := range playthroughs {
-			tests.PanicOnErr(CreatePlaythrough(&playthroughs[i]))
+			tests.PanicOnErr(CreatePlaythrough(&playthroughs[i], userId))
 		}
+
+		otherUser := tests.MakeTestUserId(getDatabase())
+		gameUnauthorised := makeGame("unauthorised", platform, otherUser)
+		tests.PanicOnErr(CreatePlaythrough(&Playthrough{
+			GameId:    gameUnauthorised,
+			StartDate: tests.GetRandomTestTime(),
+		}, otherUser))
+
 		return playthroughs
 	}
 
 	t.Run("Returns all playthroughs", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		playthroughs := makePlaythroughs()
+		userId := tests.MakeTestUserId(getDatabase())
+		playthroughs := makePlaythroughs(userId)
 
-		list, err := GetPlaythroughs(uuid.Nil)
+		list, err := GetPlaythroughs(uuid.Nil, userId)
 
 		assert.NoError(t, err)
 		assert.Len(t, list, len(playthroughs))
@@ -137,9 +164,10 @@ func TestGetPlaythroughs(t *testing.T) {
 
 	t.Run("Returns playthroughs limited to game", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
-		playthroughs := makePlaythroughs()
+		userId := tests.MakeTestUserId(getDatabase())
+		playthroughs := makePlaythroughs(userId)
 
-		list, err := GetPlaythroughs(playthroughs[0].GameId)
+		list, err := GetPlaythroughs(playthroughs[0].GameId, userId)
 
 		filtered := playthroughs[:3]
 		assert.NoError(t, err)
@@ -155,16 +183,17 @@ func TestGetPlaythroughs(t *testing.T) {
 func TestGetPlaythrough(t *testing.T) {
 	t.Run("Returns playthrough", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
 		playthrough := Playthrough{
-			GameId:    makeGame("test", makePlatform()),
+			GameId:    makeGame("test", makePlatform(userId), userId),
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
-		tests.PanicOnErr(CreatePlaythrough(&playthrough))
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
 
-		db, err := GetPlaythrough(playthrough.Id)
+		db, err := GetPlaythrough(playthrough.Id, userId)
 
 		assert.NoError(t, err)
 		db.StartDate = playthrough.StartDate.UTC()
@@ -175,7 +204,24 @@ func TestGetPlaythrough(t *testing.T) {
 	t.Run("Playthrough not found", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 
-		_, err := GetPlaythrough(tests.GetRandomUuid())
+		_, err := GetPlaythrough(tests.GetRandomUuid(), tests.MakeTestUserId(getDatabase()))
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised for game", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		playthrough := Playthrough{
+			GameId:    makeGame("test", makePlatform(userId), userId),
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
+			Status:    PlaythroughCompleted,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
+		}
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
+
+		_, err := GetPlaythrough(playthrough.Id, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
@@ -184,23 +230,24 @@ func TestGetPlaythrough(t *testing.T) {
 func TestUpdatePlaythrough(t *testing.T) {
 	t.Run("Updates existing playthrough", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
 		playthrough := Playthrough{
-			GameId:    makeGame("test", makePlatform()),
+			GameId:    makeGame("test", makePlatform(userId), userId),
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
-		tests.PanicOnErr(CreatePlaythrough(&playthrough))
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
 		playthrough.StartDate = time.Now().AddDate(0, 1, 1).UTC()
 		playthrough.EndDate = sql.NullTime{}
 		playthrough.Status = PlaythroughSuspended
 		playthrough.Runtime = sql.NullInt32{Valid: true, Int32: 9}
 
-		err := UpdatePlaythrough(&playthrough)
+		err := UpdatePlaythrough(&playthrough, userId)
 
 		assert.NoError(t, err)
-		dbPlaythrough, err := GetPlaythrough(playthrough.Id)
+		dbPlaythrough, err := GetPlaythrough(playthrough.Id, userId)
 		tests.PanicOnErr(err)
 		dbPlaythrough.StartDate = playthrough.StartDate.UTC()
 		assert.Equal(t, playthrough, *dbPlaythrough)
@@ -209,7 +256,28 @@ func TestUpdatePlaythrough(t *testing.T) {
 	t.Run("Playthrough not found", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 
-		err := UpdatePlaythrough(&Playthrough{Id: tests.GetRandomUuid()})
+		err := UpdatePlaythrough(&Playthrough{Id: tests.GetRandomUuid()}, tests.MakeTestUserId(getDatabase()))
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised for game", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		playthrough := Playthrough{
+			GameId:    makeGame("test", makePlatform(userId), userId),
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
+			Status:    PlaythroughCompleted,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
+		}
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
+		playthrough.StartDate = time.Now().AddDate(0, 1, 1).UTC()
+		playthrough.EndDate = sql.NullTime{}
+		playthrough.Status = PlaythroughSuspended
+		playthrough.Runtime = sql.NullInt32{Valid: true, Int32: 9}
+
+		err := UpdatePlaythrough(&playthrough, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
@@ -218,26 +286,44 @@ func TestUpdatePlaythrough(t *testing.T) {
 func TestDeletePlaythrough(t *testing.T) {
 	t.Run("Deletes existing playthrough", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
 		playthrough := Playthrough{
-			GameId:    makeGame("test", makePlatform()),
+			GameId:    makeGame("test", makePlatform(userId), userId),
 			StartDate: tests.GetRandomTestTime(),
 			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
 			Status:    PlaythroughCompleted,
 			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
 		}
-		tests.PanicOnErr(CreatePlaythrough(&playthrough))
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
 
-		err := DeletePlaythrough(playthrough.Id)
+		err := DeletePlaythrough(playthrough.Id, userId)
 
 		assert.NoError(t, err)
-		_, err = GetPlaythrough(playthrough.Id)
+		_, err = GetPlaythrough(playthrough.Id, userId)
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})
 
 	t.Run("Playthrough not found", func(t *testing.T) {
 		tests.GetDatabaseWithCleanup(t)
 
-		err := DeletePlaythrough(tests.GetRandomUuid())
+		err := DeletePlaythrough(tests.GetRandomUuid(), tests.MakeTestUserId(getDatabase()))
+
+		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
+	})
+
+	t.Run("User not authorised for game", func(t *testing.T) {
+		tests.GetDatabaseWithCleanup(t)
+		userId := tests.MakeTestUserId(getDatabase())
+		playthrough := Playthrough{
+			GameId:    makeGame("test", makePlatform(userId), userId),
+			StartDate: tests.GetRandomTestTime(),
+			EndDate:   sql.NullTime{Time: tests.GetRandomTestTime(), Valid: true},
+			Status:    PlaythroughCompleted,
+			Runtime:   sql.NullInt32{Valid: true, Int32: 123123},
+		}
+		tests.PanicOnErr(CreatePlaythrough(&playthrough, userId))
+
+		err := DeletePlaythrough(playthrough.Id, tests.MakeTestUserId(getDatabase()))
 
 		assert.Equal(t, operations.Errors.DataNotFoundErr, err)
 	})

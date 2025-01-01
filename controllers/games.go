@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/KowalskiPiotr98/ludivault/auth"
 	"github.com/KowalskiPiotr98/ludivault/controllers/dto"
 	"github.com/KowalskiPiotr98/ludivault/games"
 	"github.com/KowalskiPiotr98/ludivault/playthroughs"
@@ -22,7 +23,7 @@ func getGames(c *gin.Context) {
 		return
 	}
 
-	list, err := games.GetGames(model.Offset, model.Limit)
+	list, err := games.GetGames(model.Offset, model.Limit, auth.GetUserId(c))
 
 	if err != nil {
 		handleError(c, err)
@@ -38,7 +39,7 @@ func getGame(c *gin.Context) {
 		return
 	}
 
-	item, err := games.GetGame(id)
+	item, err := games.GetGame(id, auth.GetUserId(c))
 	if err != nil {
 		handleError(c, err)
 		return
@@ -50,7 +51,7 @@ func getGame(c *gin.Context) {
 func getPlaythroughsForGame(c *gin.Context) {
 	id, err := parseUuidFromPath(c)
 
-	list, err := playthroughs.GetPlaythroughs(id)
+	list, err := playthroughs.GetPlaythroughs(id, auth.GetUserId(c))
 
 	if err != nil {
 		handleError(c, err)
@@ -67,7 +68,7 @@ func createGame(c *gin.Context) {
 	}
 
 	mapped := dto.MapGameEditDtoToObject(uuid.Nil, &model)
-	if err := games.CreateGame(mapped); err != nil {
+	if err := games.CreateGame(mapped, auth.GetUserId(c)); err != nil {
 		handleError(c, err)
 		return
 	}
@@ -86,7 +87,7 @@ func updateGame(c *gin.Context) {
 	}
 
 	mapped := dto.MapGameEditDtoToObject(id, &model)
-	if err = games.UpdateGame(mapped); err != nil {
+	if err = games.UpdateGame(mapped, auth.GetUserId(c)); err != nil {
 		handleError(c, err)
 		return
 	}
@@ -100,7 +101,7 @@ func deleteGame(c *gin.Context) {
 		return
 	}
 
-	err = games.DeleteGame(id)
+	err = games.DeleteGame(id, auth.GetUserId(c))
 	if err != nil {
 		handleError(c, err)
 		return

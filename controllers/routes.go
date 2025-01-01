@@ -1,10 +1,22 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/KowalskiPiotr98/ludivault/auth"
+	"github.com/gin-gonic/gin"
+)
 
 func SetRoutes(r *gin.RouterGroup) {
+	//auths API
+	auths := r.Group("/auth")
+	auths.GET("", initAuth)
+	auths.GET("/callback", authCallback)
+	auths.GET("/logout", logout)
+	auths.GET("/providers", getProviders)
+	auths.GET("/me", getUser)
+
 	// platforms API
 	platforms := r.Group("/platforms")
+	platforms.Use(auth.GetLoginRequiredMiddleware())
 	platforms.GET("", getPlatforms)
 	platforms.GET("/:id", getPlatform)
 	platforms.POST("", createPlatform)
@@ -13,6 +25,7 @@ func SetRoutes(r *gin.RouterGroup) {
 
 	// games API
 	games := r.Group("/games")
+	games.Use(auth.GetLoginRequiredMiddleware())
 	games.GET("", getGames)
 	games.GET("/:id", getGame)
 	games.GET("/:id/playthroughs", getPlaythroughsForGame)
@@ -22,6 +35,7 @@ func SetRoutes(r *gin.RouterGroup) {
 
 	// playthroughs API
 	playthroughs := r.Group("/playthroughs")
+	playthroughs.Use(auth.GetLoginRequiredMiddleware())
 	playthroughs.GET("", getPlaythroughs)
 	playthroughs.GET("/:id", getPlaythrough)
 	playthroughs.POST("", createPlaythrough)
