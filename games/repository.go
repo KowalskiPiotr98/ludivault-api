@@ -1,6 +1,7 @@
 package games
 
 import (
+	"fmt"
 	"github.com/KowalskiPiotr98/gotabase"
 	"github.com/KowalskiPiotr98/gotabase/operations"
 	"github.com/google/uuid"
@@ -8,9 +9,35 @@ import (
 )
 
 // GetGames returns a list of games with offset and limit used for pagination.
-func GetGames(offset int, limit int, userId uuid.UUID) ([]*Game, error) {
-	query := `select id, platform_id, title, owned, release_date, released from games where user_id = $3 order by title offset $1 limit $2`
-	return operations.QueryRows(getDatabase(), scanGame, query, offset, limit, userId)
+func GetGames(offset int, limit int, userId uuid.UUID, title string, owned *bool, released *bool, inProgress *bool) ([]*Game, error) {
+	query := `select id, platform_id, title, owned, release_date, released from games where user_id = $3 %s order by title offset $1 limit $2`
+	args := []interface{}{offset, limit, userId}
+
+	if title != "" {
+		args = append(args, fmt.Sprintf("%%%s%%", title))
+		query = fmt.Sprintf(query, fmt.Sprintf("and title ilike $%d %%s", len(args)))
+	}
+
+	if owned != nil {
+		args = append(args, *owned)
+		query = fmt.Sprintf(query, fmt.Sprintf("and owned = $%d %%s ", len(args)))
+	}
+
+	if released != nil {
+		args = append(args, *released)
+		query = fmt.Sprintf(query, fmt.Sprintf("and released = $%d %%s ", len(args)))
+	}
+
+	if inProgress != nil {
+		not := "not"
+		if *inProgress {
+			not = ""
+		}
+		query = fmt.Sprintf(query, fmt.Sprintf("and %s exists(select * from playthroughs where game_id = games.id and status = 0 limit 1) %%s", not))
+	}
+
+	query = fmt.Sprintf(query, "")
+	return operations.QueryRows(getDatabase(), scanGame, query, args...)
 }
 
 // GetGame returns a single game selected by id.

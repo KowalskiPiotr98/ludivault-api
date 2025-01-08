@@ -13,8 +13,12 @@ import (
 
 func getGames(c *gin.Context) {
 	model := struct {
-		Limit  int `form:"limit" binding:"min=1,max=100"`
-		Offset int `form:"offset" binding:"min=0"`
+		Limit      int    `form:"limit" binding:"min=1,max=100"`
+		Offset     int    `form:"offset" binding:"min=0"`
+		Title      string `form:"title"`
+		Released   *bool  `form:"released"`
+		Owned      *bool  `form:"owned"`
+		InProgress *bool  `form:"inProgress"`
 	}{
 		Limit:  20,
 		Offset: 0,
@@ -23,7 +27,7 @@ func getGames(c *gin.Context) {
 		return
 	}
 
-	list, err := games.GetGames(model.Offset, model.Limit, auth.GetUserId(c))
+	list, err := games.GetGames(model.Offset, model.Limit, auth.GetUserId(c), model.Title, model.Owned, model.Released, model.InProgress)
 
 	if err != nil {
 		handleError(c, err)

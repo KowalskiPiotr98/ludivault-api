@@ -27,3 +27,7 @@ func MakeTestUser(connector gotabase.Connector, id uuid.UUID) {
 	_, err := connector.Exec(query, id, id.String(), id.String(), id.String())
 	PanicOnErr(err)
 }
+
+func GetPointerFromValue[T any](value T) *T {
+	return &value
+}
