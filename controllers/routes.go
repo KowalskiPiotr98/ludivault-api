@@ -29,6 +29,7 @@ func SetRoutes(r *gin.RouterGroup) {
 	games.GET("", getGames)
 	games.GET("/:id", getGame)
 	games.GET("/:id/playthroughs", getPlaythroughsForGame)
+	games.GET("/:id/notes", getNoteTitles)
 	games.POST("", createGame)
 	games.PUT("/:id", updateGame)
 	games.DELETE("/:id", deleteGame)
@@ -41,4 +42,12 @@ func SetRoutes(r *gin.RouterGroup) {
 	playthroughs.POST("", createPlaythrough)
 	playthroughs.PUT("/:id", updatePlaythrough)
 	playthroughs.DELETE("/:id", deletePlaythrough)
+
+	// notes API
+	notes := r.Group("/notes")
+	notes.Use(auth.GetLoginRequiredMiddleware())
+	notes.GET("/:id", getNote)
+	notes.POST("", createNote)
+	notes.PUT("/:id", updateNote)
+	notes.DELETE("/:id", deleteNote)
 }
