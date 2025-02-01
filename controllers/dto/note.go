@@ -32,7 +32,7 @@ type ModifyNoteDto struct {
 	GameId uuid.UUID `json:"gameId" binding:"required"`
 	Title  string    `json:"title" binding:"required,max=100"`
 	Value  string    `json:"value" binding:"required,max=10000"`
-	Kind   int8      `json:"kind" binding:"required,min=0,max=1"`
+	Kind   int8      `json:"kind" binding:"min=0,max=1"`
 	Pinned bool      `json:"pinned"`
 }
 
