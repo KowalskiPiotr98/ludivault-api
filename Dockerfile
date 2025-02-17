@@ -1,9 +1,9 @@
-FROM golang:1.23 AS build
+FROM golang:1.24 AS build
 WORKDIR /build
 COPY . .
 RUN go build
 
-FROM golang:1.23 AS run
+FROM golang:1.24 AS run
 EXPOSE 5500
 ENV LUDIVAULT_LISTEN=0.0.0.0:5500
 
